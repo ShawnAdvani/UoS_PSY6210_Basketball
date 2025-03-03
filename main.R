@@ -2,7 +2,7 @@
 data = read.delim("data/Basketball.txt", header = TRUE, sep = "\t", dec = ".")
 
 ## Logistic Regression of Basketball Team Points to Wins
-# Build the logit glm
+# Build the logit glm object
 point_win = glm(Win ~ TeamPoints, data = data, family = binomial (link = 'logit'))
 summary(point_win)
 
@@ -34,3 +34,18 @@ plot(point_win_probs, point_win_logodds, type = 'p', col = 'purple',
 
 # TODO change all plots to ggplot
 # TODO add analysis summary
+
+## For Fun Turn It Into A Predictive Model
+# split into train and test data
+sample <- sample(c(TRUE, FALSE), nrow(data), replace=TRUE, prob=c(0.7,0.3))
+train <- data[sample, ]
+test <- data[!sample, ] 
+
+model = glm(Win ~ TeamPoints, data = train, family = binomial (link = 'logit'))
+pscl::pR2(model)["McFadden"]  # Scores consistently under 0.40, not a good model fit. Still Continuing
+
+# TODO the following tests multicolinearity, can check if we add other independent varaiables to model
+# car::vif(model)
+
+predicted <- predict(model, test, type="response")
+predicted
