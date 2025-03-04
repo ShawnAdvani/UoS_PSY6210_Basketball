@@ -35,6 +35,14 @@ plot(point_win_probs, point_win_logodds, type = 'p', col = 'purple',
 # TODO change all plots to ggplot
 # TODO add analysis summary
 
+
+
+
+# TODO Note for team members. Fouls and Assists might be good to check next. We can later combine whatever's significant into a single regression analysis or even the predictive model below (did it for fun, might delete).  
+
+
+
+
 ## For Fun Turn It Into A Predictive Model
 # split into train and test data
 sample <- sample(c(TRUE, FALSE), nrow(data), replace=TRUE, prob=c(0.7,0.3))
