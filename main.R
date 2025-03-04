@@ -49,11 +49,14 @@ sample <- sample(c(TRUE, FALSE), nrow(data), replace=TRUE, prob=c(0.7,0.3))
 train <- data[sample, ]
 test <- data[!sample, ] 
 
+# create model
 model = glm(Win ~ TeamPoints, data = train, family = binomial (link = 'logit'))
+# test model fit
 pscl::pR2(model)["McFadden"]  # Scores consistently under 0.40, not a good model fit. Still Continuing
 
 # TODO the following tests multicolinearity, can check if we add other independent varaiables to model
 # car::vif(model)
 
+# make predictions
 predicted <- predict(model, test, type="response")
 predicted
