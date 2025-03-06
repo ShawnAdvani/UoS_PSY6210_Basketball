@@ -86,6 +86,46 @@ ggplot(mapping = aes(x = x3_win_probs, y = x3_win_logodds)) +
   geom_point(color = "purple", size = 3) +
   labs(title = "Threepoint shots Win Ratio: LogOdds Probability", x = "Probabilities", y = "LogOdds")
 
+
+##Assists to wins -----------------------------------------------------------------------------------------------------------------------
+## Logistic Regression of assists to wins
+# Build the logit glm object
+assist_win = glm(Win ~ Assists, data = data, family = binomial (link = 'logit'))
+summary(assist_win)
+
+# Calculate LogOdds, Odds, and Probability Space arrays
+assist_win_logodds = assist_win$coefficients[1]+assist_win$coefficients[2]*data$Assists
+assist_win_odds = exp(assist_win_logodds)
+assist_win_probs = assist_win_odds/(1+assist_win_odds)
+
+# Graph arrays
+ggplot(mapping = aes(x = data$Assists, y = assist_win_logodds)) +
+  geom_point(color = "red", size = 3) +
+  labs(title = "Assist Win Ratio: LogOdds", x = "Assists", y = "LogOdds")
+
+ggplot(mapping = aes(x = data$Assists, y = assist_win_odds)) +
+  geom_point(color = "darkgreen", size = 3) +
+  labs(title = "Assist Win Ratio: Odds", x = "Assists", y = "Odds")
+
+ggplot(mapping = aes(x = data$Assists, y = assist_win_probs)) +
+  geom_point(color = "blue", size = 3) +
+  labs(title = "Assist Win Ratio: Probabilities", x = "Assists", y = "Probabilities")
+
+## Assists to Wins Regression Assessment and Analysis
+# Deviance
+assist_win_deviance = with(assist_win, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
+# Hit Table
+assist_win_hit_table = table(data$Win, assist_win$fitted.values > 0.5)
+assist_win_hit_table
+sum(diag(assist_win_hit_table)) / sum(assist_win_hit_table)
+
+# LogOdds Probability Ratio
+ggplot(mapping = aes(x = assist_win_probs, y = assist_win_logodds)) +
+  geom_point(color = "purple", size = 3) +
+  labs(title = "Assist Win Ratio: LogOdds Probability", x = "Probabilities", y = "LogOdds")
+
+
 ##Predictive Model --------------------------------------------------------------------------------------------------------------------------------
 ## For fun turn it into a predictive model
 # split into train and test data
