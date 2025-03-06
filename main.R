@@ -1,6 +1,10 @@
+library(tidyverse)
+
+##Reading and preparing data -----------------------------------------------------------------------------------------------------------------------
 # Load Data
 data = read.delim("data/Basketball.txt", header = TRUE, sep = "\t", dec = ".")
 
+##Team points to wins ------------------------------------------------------------------------------------------------------------------------------
 ## Logistic Regression of Basketball Team Points to Wins
 # Build the logit glm object
 point_win = glm(Win ~ TeamPoints, data = data, family = binomial (link = 'logit'))
@@ -12,12 +16,17 @@ point_win_odds = exp(point_win_logodds)
 point_win_probs = point_win_odds/(1+point_win_odds)
 
 # Graph arrays
-plot(data$TeamPoints, point_win_logodds, type = 'p', col = 'red', 
-     main='Team Points Win Ratio: LogOdds', xlab='Team Points', ylab='LogOdds')
-plot(data$TeamPoints, point_win_odds, type = 'p', col = 'green', 
-     main='Team Points Win Ratio: Odds', xlab='Team Points', ylab='Odds')
-plot(data$TeamPoints, point_win_probs, type = 'p', col = 'blue', 
-     main='Team Points Win Ratio: Probabilities', xlab='Team Points', ylab='Probabilities')
+ggplot(mapping = aes(x = data$TeamPoints, y = point_win_logodds)) +
+  geom_point(color = "red", size = 3) +
+  labs(title = "Team Points Win Ratio: LogOdds", x = "Team Points", y = "LogOdds")
+
+ggplot(mapping = aes(x = data$TeamPoints, y = point_win_odds)) +
+  geom_point(color = "darkgreen", size = 3) +
+  labs(title = "Team Points Win Ratio: Odds", x = "Team Points", y = "Odds")
+
+ggplot(mapping = aes(x = data$TeamPoints, y = point_win_probs)) +
+  geom_point(color = "blue", size = 3) +
+  labs(title = "Team Points Win Ratio: Probabilities", x = "Team Points", y = "Probabilities")
 
 ## Team Points to Wins Regression Assessment and Analysis
 # Deviance
@@ -29,21 +38,56 @@ point_win_hit_table
 sum(diag(point_win_hit_table)) / sum(point_win_hit_table)
 
 # LogOdds Probability Ratio
-plot(point_win_probs, point_win_logodds, type = 'p', col = 'purple',
-     main = 'Team Points Win Ratio: LogOdds Probability', xlab = 'Probabilities', ylab = 'LogOdds')
+ggplot(mapping = aes(x = point_win_probs, y = point_win_logodds)) +
+  geom_point(color = "purple", size = 3) +
+  labs(title = "Team Points Win Ratio: LogOdds Probability", x = "Probabilities", y = "LogOdds")
 
-# TODO change all plots to ggplot
+
 # TODO add analysis summary
-
-
-
 
 # TODO Note for team members. Fouls and Assists might be good to check next. We can later combine whatever's significant into a single regression analysis or even the predictive model below (did it for fun, might delete).  
 
 
+##Three point shots to wins -----------------------------------------------------------------------------------------------------------------------
+## Logistic Regression of Basketball threepoint shots to Wins
+# Build the logit glm object
+x3_win = glm(Win ~ X3PointShots, data = data, family = binomial (link = 'logit'))
+summary(x3_win)
 
+# Calculate LogOdds, Odds, and Probability Space arrays
+x3_win_logodds = x3_win$coefficients[1]+x3_win$coefficients[2]*data$X3PointShots
+x3_win_odds = exp(x3_win_logodds)
+x3_win_probs = x3_win_odds/(1+x3_win_odds)
 
-## For Fun Turn It Into A Predictive Model
+# Graph arrays
+ggplot(mapping = aes(x = data$X3PointShots, y = x3_win_logodds)) +
+  geom_point(color = "red", size = 3) +
+  labs(title = "Threepoint shots Win Ratio: LogOdds", x = "Threepoint shots", y = "LogOdds")
+
+ggplot(mapping = aes(x = data$X3PointShots, y = x3_win_odds)) +
+  geom_point(color = "darkgreen", size = 3) +
+  labs(title = "Threepoint shots Win Ratio: Odds", x = "Threepoint shots", y = "Odds")
+
+ggplot(mapping = aes(x = data$X3PointShots, y = x3_win_probs)) +
+  geom_point(color = "blue", size = 3) +
+  labs(title = "Threepoint shots Win Ratio: Probabilities", x = "Threepoint shots", y = "Probabilities")
+
+## Team Points to Wins Regression Assessment and Analysis
+# Deviance
+x3_win_deviance = with(x3_win, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
+# Hit Table
+x3_win_hit_table = table(data$Win, x3_win$fitted.values > 0.5)
+x3_win_hit_table
+sum(diag(x3_win_hit_table)) / sum(x3_win_hit_table)
+
+# LogOdds Probability Ratio
+ggplot(mapping = aes(x = x3_win_probs, y = x3_win_logodds)) +
+  geom_point(color = "purple", size = 3) +
+  labs(title = "Threepoint shots Win Ratio: LogOdds Probability", x = "Probabilities", y = "LogOdds")
+
+##Predictive Model --------------------------------------------------------------------------------------------------------------------------------
+## For fun turn it into a predictive model
 # split into train and test data
 sample <- sample(c(TRUE, FALSE), nrow(data), replace=TRUE, prob=c(0.7,0.3))
 train <- data[sample, ]
