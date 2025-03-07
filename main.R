@@ -152,7 +152,7 @@ test = data[!sample, ]
 # create model
 model = glm(Win ~ TeamPoints + X3PointShots + Assists, data = train, family = binomial (link = 'logit'))
 # test model fit
-pscl::pR2(model)["McFadden"]  # Scores consistently under 0.40, not a good model fit.
+pscl::pR2(model)["McFadden"]  # Scores consistently under 0.40
 
 # TODO the following tests multicolinearity, can check if we add other independent variables to model
 # car::vif(model)
